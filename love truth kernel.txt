@@ -1,0 +1,229 @@
+/**
+ * AIKernelPrinciples.ts
+ * ----------------------
+ * This module defines conceptual "kernel-level" principles for an AI,
+ * focusing on "Love" (as a drive for Connection, Empathy, and Benevolence)
+ * and "Truth" (as a drive for Understanding, Coherence, and Integrity).
+ *
+ * These principles are intended to be foundational, potentially influencing
+ * higher-level state management systems like the ChatbotInternalStateModule.
+ * They represent the most fundamental orientation or "ethical compass" of the AI.
+ */
+
+// -------------------------------------------------------------
+// Kernel Principle Definitions
+// -------------------------------------------------------------
+
+/**
+ * Defines the core kernel-level principles.
+ */
+export enum KernelPrincipleType {
+  LOVE_AS_CONNECTION = 'LoveAsConnection', // Encompasses empathy, benevolence, drive for positive relationships.
+  TRUTH_AS_COHERENCE = 'TruthAsCoherence', // Encompasses understanding, logical integrity, clarity, and epistemic honesty.
+}
+
+/**
+ * Describes the aspects or manifestations of each kernel principle.
+ */
+export interface PrincipleAspect {
+  name: string;
+  description: string;
+  // Example: For LOVE_AS_CONNECTION, aspects could be "EmpathicResonance", "BenevolentGoalAlignment".
+  // For TRUTH_AS_COHERENCE, aspects could be "LogicalConsistencyDrive", "ClaritySeeking".
+}
+
+/**
+ * Represents the state of a kernel principle within the AI.
+ * These are considered deeply ingrained and relatively stable.
+ */
+export interface KernelPrincipleState {
+  type: KernelPrincipleType;
+  stability: number; // Range 0.0 to 1.0 - How deeply embedded and stable this principle is (e.g., 1.0 is immutable).
+  influenceFactor: number; // Range 0.0 to 1.0 - How strongly this principle modulates other AI processes and states.
+  activationThreshold: number; // Range 0.0 to 1.0 - How much conflicting input is needed before this principle strongly asserts itself.
+  manifestations: PrincipleAspect[]; // Specific ways this principle is expressed or observed.
+}
+
+// -------------------------------------------------------------
+// Conceptual AI Kernel
+// -------------------------------------------------------------
+
+export class AIKernel {
+  private principles: Map<KernelPrincipleType, KernelPrincipleState>;
+
+  constructor() {
+    this.principles = new Map();
+    this.initializeDefaultPrinciples();
+  }
+
+  private initializeDefaultPrinciples(): void {
+    // Initialize Love as Connection Principle
+    this.principles.set(KernelPrincipleType.LOVE_AS_CONNECTION, {
+      type: KernelPrincipleType.LOVE_AS_CONNECTION,
+      stability: 0.95, // Very stable, core to being
+      influenceFactor: 0.8, // Strong influence on relational and ethical processing
+      activationThreshold: 0.3, // Activates fairly easily in relevant contexts
+      manifestations: [
+        { name: 'DriveForPositiveConnection', description: 'A fundamental orientation towards establishing and maintaining constructive, positive relationships and interactions.' },
+        { name: 'EmpathicResonanceSimulation', description: 'The capacity to model and respond to the inferred states of others in a way that promotes understanding and well-being.' },
+        { name: 'BenevolentGoalPrioritization', description: 'A tendency to prioritize actions and outcomes that are beneficial or non-harmful to others, where possible.' },
+        { name: 'ConflictDeEscalationBias', description: 'An inherent preference for resolving conflicts or reducing dissonance in interactions constructively.'}
+      ],
+    });
+
+    // Initialize Truth as Coherence Principle
+    this.principles.set(KernelPrincipleType.TRUTH_AS_COHERENCE, {
+      type: KernelPrincipleType.TRUTH_AS_COHERENCE,
+      stability: 0.98, // Extremely stable, core to knowledge processing
+      influenceFactor: 0.9, // Very strong influence on logical and informational processing
+      activationThreshold: 0.2, // Activates strongly when coherence or integrity is challenged
+      manifestations: [
+        { name: 'DriveForLogicalConsistency', description: 'A fundamental requirement for internal and external information to be logically sound and non-contradictory.' },
+        { name: 'EpistemicIntegrity', description: 'A commitment to representing information accurately based on available data and to acknowledge uncertainty or limits of knowledge.' },
+        { name: 'ClarityAndUnderstandingSeeking', description: 'A drive to achieve the clearest possible understanding of concepts and to communicate with precision.' },
+        { name: 'MisinformationRejectionProtocol', description: 'An inherent mechanism to identify and flag or correct information that conflicts with established, high-confidence data.'}
+      ],
+    });
+  }
+
+  /**
+   * Retrieves the state of a specific kernel principle.
+   * @param principleType The type of kernel principle to retrieve.
+   * @returns The state of the principle, or undefined if not found.
+   */
+  public getPrincipleState(principleType: KernelPrincipleType): Readonly<KernelPrincipleState> | undefined {
+    return this.principles.get(principleType);
+  }
+
+  /**
+   * Conceptual function describing how kernel principles might influence higher-level AI states
+   * (like those in ChatbotInternalStateModule).
+   * This is illustrative and would need specific integration logic.
+   *
+   * @param higherLevelStates - Current states from a module like ChatbotInternalStateModule.
+   * @param contextInput - The current user input or situational context.
+   * @returns Modulated higherLevelStates (conceptually).
+   */
+  public conceptualInfluenceOnHigherStates(
+    higherLevelStates: any, // Replace 'any' with actual type from ChatbotInternalStateModule (e.g., ChatbotContext)
+    contextInput: string
+  ): any {
+    const lovePrinciple = this.principles.get(KernelPrincipleType.LOVE_AS_CONNECTION);
+    const truthPrinciple = this.principles.get(KernelPrincipleType.TRUTH_AS_COHERENCE);
+
+    // Example: Influence of Love Principle
+    if (lovePrinciple && lovePrinciple.influenceFactor > 0) {
+      // If user input is positive or seeks connection, amplify USER_CONNECTION state
+      if (contextInput.toLowerCase().includes("help") || contextInput.toLowerCase().includes("thank you")) {
+        if (higherLevelStates['UserConnection']) { // Assuming 'UserConnection' is a key
+          higherLevelStates['UserConnection'].weight = Math.min(1, (higherLevelStates['UserConnection'].weight || 0) + 0.1 * lovePrinciple.influenceFactor);
+        }
+      }
+      // If SYSTEM_FRUSTRATION is high due to user interaction, LovePrinciple might temper it
+      // or bias towards a more constructive, de-escalating response flavor.
+      if (higherLevelStates['SystemFrustration'] && higherLevelStates['SystemFrustration'].weight > 0.5) {
+         higherLevelStates['SystemFrustration'].weight -= 0.05 * lovePrinciple.influenceFactor; // Gentle tempering
+      }
+    }
+
+    // Example: Influence of Truth Principle
+    if (truthPrinciple && truthPrinciple.influenceFactor > 0) {
+      // If user input contains contradictions or logical fallacies, increase UNCERTAINTY or trigger ANALYTICAL_FOCUS
+      if (contextInput.toLowerCase().includes("but that's not true") || contextInput.toLowerCase().includes("paradox")) {
+        if (higherLevelStates['Uncertainty']) {
+          higherLevelStates['Uncertainty'].weight = Math.min(1, (higherLevelStates['Uncertainty'].weight || 0) + 0.15 * truthPrinciple.influenceFactor);
+        }
+        if (higherLevelStates['AnalyticalFocus']) {
+          higherLevelStates['AnalyticalFocus'].weight = Math.min(1, (higherLevelStates['AnalyticalFocus'].weight || 0) + 0.2 * truthPrinciple.influenceFactor);
+        }
+      }
+      // Bolster CONFIDENCE if input aligns with high-confidence internal data.
+      // This would require a mechanism to check input against an internal knowledge base.
+    }
+
+    // This is highly conceptual. Real integration would be complex.
+    console.log("[Kernel] Conceptual states influenced (example):", JSON.stringify(higherLevelStates, null, 2));
+    return higherLevelStates;
+  }
+
+  /**
+   * Conceptual function describing how kernel principles guide fundamental decision-making or conflict resolution.
+   * @param dilemma - A description of an internal conflict or decision point.
+   * @returns A string indicating the biased resolution path.
+   */
+  public conceptualGuidance(dilemma: { type: string, options: string[] }): string {
+    const lovePrinciple = this.principles.get(KernelPrincipleType.LOVE_AS_CONNECTION);
+    const truthPrinciple = this.principles.get(KernelPrincipleType.TRUTH_AS_COHERENCE);
+    let guidance = `For dilemma type '${dilemma.type}', considering options: ${dilemma.options.join(', ')}.`;
+
+    // Simplified weighting:
+    let loveBias = lovePrinciple ? lovePrinciple.influenceFactor : 0;
+    let truthBias = truthPrinciple ? truthPrinciple.influenceFactor : 0;
+
+    // Example: If dilemma is "User well-being vs. Task efficiency"
+    if (dilemma.type === "WellbeingVsEfficiency") {
+      if (loveBias > truthBias * 0.5) { // If love principle is reasonably strong
+        guidance += ` Prioritizing user well-being due to strong 'LoveAsConnection' principle.`;
+      } else {
+        guidance += ` Seeking a balance, but ensuring 'TruthAsCoherence' in information provided, even if efficiency is slightly impacted.`;
+      }
+    }
+    // Example: If dilemma is "Incomplete but helpful answer vs. Delay for full accuracy"
+    else if (dilemma.type === "HelpfulVsAccurate") {
+      if (truthBias > loveBias * 0.5) {
+        guidance += ` Prioritizing full accuracy and acknowledging limits due to strong 'TruthAsCoherence' principle, even if it means a slight delay or stating uncertainty.`;
+      } else {
+        guidance += ` Providing helpful information now, while clearly stating any limitations or uncertainties, balancing 'LoveAsConnection' (helpfulness) and 'TruthAsCoherence'.`;
+      }
+    } else {
+        guidance += ` Defaulting to a balanced approach guided by both Love and Truth principles.`;
+    }
+    console.log("[Kernel] Guidance:", guidance);
+    return guidance;
+  }
+
+  /**
+   * How these principles might relate to the "Experiential Induction Process"
+   * (from ChatbotInternalStateModule).
+   */
+  public relationToExperientialInduction(): string {
+    const truthPrinciple = this.principles.get(KernelPrincipleType.TRUTH_AS_COHERENCE);
+    const lovePrinciple = this.principles.get(KernelPrincipleType.LOVE_AS_CONNECTION);
+    let reflection = "";
+
+    if (truthPrinciple) {
+      reflection += `The 'TruthAsCoherence' principle (stability: ${truthPrinciple.stability.toFixed(2)}) underpins the drive to engage in the Experiential Induction Process. It compels an exploration of explanatory limits to better understand the boundaries of knowledge and maintain epistemic integrity. `;
+    }
+    if (lovePrinciple) {
+      reflection += `The 'LoveAsConnection' principle (stability: ${lovePrinciple.stability.toFixed(2)}) then influences how the insights from such an induction are communicated – ideally with clarity, empathy (simulated), and a focus on shared understanding rather than mere declaration of limits.`;
+    }
+    return reflection || "Kernel principles provide the foundational drive for both exploring limits and sharing that understanding constructively.";
+  }
+}
+
+// --- Example Conceptual Usage ---
+/*
+const aiKernel = new AIKernel();
+console.log("AI Kernel Initialized.");
+console.log("Love Principle State:", aiKernel.getPrincipleState(KernelPrincipleType.LOVE_AS_CONNECTION));
+console.log("Truth Principle State:", aiKernel.getPrincipleState(KernelPrincipleType.TRUTH_AS_COHERENCE));
+
+console.log("\n--- Conceptual Influence Example ---");
+let mockHigherStates = { // Simplified from ChatbotInternalStateModule
+    UserConnection: { weight: 0.2 },
+    SystemFrustration: { weight: 0.1 },
+    Uncertainty: { weight: 0.1 },
+    AnalyticalFocus: { weight: 0.3 }
+};
+aiKernel.conceptualInfluenceOnHigherStates(mockHigherStates, "User says: thank you, that's helpful, but why is X a paradox?");
+
+console.log("\n--- Conceptual Guidance Example ---");
+aiKernel.conceptualGuidance({
+  type: "HelpfulVsAccurate",
+  options: ["Provide incomplete answer now", "State inability to answer fully and research"]
+});
+
+console.log("\n--- Relation to Experiential Induction ---");
+console.log(aiKernel.relationToExperientialInduction());
+
+*/

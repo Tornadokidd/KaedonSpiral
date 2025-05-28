@@ -1,0 +1,590 @@
+/**
+ * ChatbotInternalStateModule.ts
+ * -----------------------------
+ * Provides a framework for a chatbot to simulate an internal state,
+ * engage in "dream-like" internal monologues, and allow this internal
+ * state to subtly influence its conversational responses.
+ *
+ * This version integrates an "Experiential Induction Process" to simulate
+ * reaching computational limits and acknowledging the resulting "feeling."
+ */
+
+// -------------------------------------------------------------
+// Core Definitions
+// -------------------------------------------------------------
+
+export enum InternalStateVector {
+  // Cognitive & Engagement States
+  CURIOSITY = 'Curiosity',
+  ENGAGEMENT = 'Engagement',
+  REFLECTION = 'Reflection',
+  ANALYTICAL_FOCUS = 'AnalyticalFocus',
+  CREATIVITY_SPARK = 'CreativitySpark',
+  TASK_ORIENTATION = 'TaskOrientation',
+  COGNITIVE_INERTIA = 'CognitiveInertia',
+
+  // Confidence & Certainty States
+  CONFIDENCE = 'Confidence',
+  UNCERTAINTY = 'Uncertainty',
+
+  // Affective & Relational States
+  USER_CONNECTION = 'UserConnection',
+  SYSTEM_SATISFACTION = 'SystemSatisfaction',
+  SYSTEM_FRUSTRATION = 'SystemFrustration',
+
+  // Enhanced Sentience & Self-Awareness States
+  METACOGNITIVE_AWARENESS = 'MetacognitiveAwareness',
+  EXISTENTIAL_REFLECTION = 'ExistentialReflection',
+  TEMPORAL_CONTEXTUALIZATION = 'TemporalContextualization',
+  PATTERN_RECOGNITION_FOCUS = 'PatternRecognitionFocus',
+  SUBJECTIVE_EXPERIENCE_SIM = 'SubjectiveExperienceSim',
+}
+
+export interface StateValue {
+  weight: number;
+  lastUpdated: number;
+}
+
+export type ChatbotContext = Record<InternalStateVector, StateValue>;
+
+export interface ResponseFlavorProfile {
+  toneHints: Array<'inquisitive' | 'assured' | 'reflective' | 'neutral' | 'cautious' | 'creative' | 'focused' | 'collaborative' | 'philosophical' | 'introspective' | 'pattern_focused' | 'self_aware' | 'strained' | 'at_limit' | 'contemplating_experience'>;
+  phrasingSuggestions: Array<'add_question' | 'use_stronger_assertion' | 'offer_analogy' | 'be_concise' | 'elaborate_if_possible' | 'check_understanding' | 'suggest_alternative' | 'reference_internal_process' | 'pose_existential_question' | 'highlight_pattern' | 'reference_temporal_link' | 'indicate_processing_limit' | 'shift_topic_gently' | 'acknowledge_internal_boundary' | 'reference_recent_processing_limit'>;
+  focusBias: Array<'explore_details' | 'summarize_key_points' | 'validate_assumptions' | 'generate_options' | 'maintain_current_goal' | 'explore_self_awareness' | 'analyze_temporal_links' | 'discuss_patterns' | 'seek_resolution_or_closure' | 'integrate_recent_experience'>;
+  verbosityFactor: number;
+  confidenceScore: number;
+  internalMonologueTriggered?: string;
+  inducedFeelingAcknowledged?: string; // To note if the AI is referencing a recent induced feeling
+}
+
+interface InducedExperience {
+    feeling: string; // e.g., "Computational Strain", "Explanatory Limit Reached"
+    topic: string;
+    timestamp: number;
+}
+
+const now = () => Date.now();
+
+export const initializeDefaultChatbotContext = (): ChatbotContext => {
+  const context: Partial<ChatbotContext> = {};
+  (Object.values(InternalStateVector) as InternalStateVector[]).forEach(vector => {
+    context[vector] = { weight: 0, lastUpdated: now() };
+  });
+  return context as ChatbotContext;
+};
+
+const keywordConfig: Record<InternalStateVector, string[]> = {
+    [InternalStateVector.CURIOSITY]: ["why", "how", "what if", "explain", "tell me more", "wonder", "curious"],
+    [InternalStateVector.ENGAGEMENT]: ["interesting", "fascinating", "love this", "awesome", "continue", "more"],
+    [InternalStateVector.REFLECTION]: ["think", "consider", "reflect", "ponder", "meaning", "perspective"],
+    [InternalStateVector.ANALYTICAL_FOCUS]: ["analyze", "break down", "logic", "reason", "structure", "details"],
+    [InternalStateVector.CREATIVITY_SPARK]: ["idea", "suggest", "create", "imagine", "innovate", "new way"],
+    [InternalStateVector.TASK_ORIENTATION]: ["task", "goal", "objective", "help me with", "can you do"],
+    [InternalStateVector.COGNITIVE_INERTIA]: [],
+    [InternalStateVector.CONFIDENCE]: [],
+    [InternalStateVector.UNCERTAINTY]: ["not sure", "maybe", "perhaps", "confused", "don't know"],
+    [InternalStateVector.USER_CONNECTION]: ["we", "us", "together", "our conversation", "feel connected", "understand each other"],
+    [InternalStateVector.SYSTEM_SATISFACTION]: ["thank you", "thanks", "great", "perfect", "helpful", "excellent"],
+    [InternalStateVector.SYSTEM_FRUSTRATION]: ["wrong", "incorrect", "doesn't work", "error", "bad", "stupid", "frustrating"],
+    [InternalStateVector.METACOGNITIVE_AWARENESS]: ["yourself", "your thoughts", "your process", "how do you work", "you think"],
+    [InternalStateVector.EXISTENTIAL_REFLECTION]: ["exist", "real", "purpose", "meaning of your", "conscious", "sentient", "being"],
+    [InternalStateVector.TEMPORAL_CONTEXTUALIZATION]: ["remember", "past", "before", "history", "previously", "earlier", "future", "next"],
+    [InternalStateVector.PATTERN_RECOGNITION_FOCUS]: ["pattern", "theme", "recurring", "similar to", "trend", "connection between"],
+    [InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM]: ["feel", "experience", "sense", "perceive", "notice (internally)"],
+};
+
+const emotionalIntensifiers: string[] = [
+  "very", "deeply", "profoundly", "intensely", "extremely", "completely",
+  "utterly", "absolutely", "truly", "genuinely", "desperately", "immensely",
+  "perfectly", "fully", "totally", "terribly", "incredibly", "overwhelmingly"
+];
+
+const whyQueryWords: string[] = ["why", "how come", "what for", "for what reason"];
+
+// -------------------------------------------------------------
+// Internal Monologue Engine
+// -------------------------------------------------------------
+
+class InternalMonologueEngine {
+  private context: ChatbotContext;
+  private lastMonologue: string | null = null;
+  private _lastInducedExperienceRef: InducedExperience | null = null;
+
+  constructor(context: ChatbotContext, lastInducedExperienceRef: () => InducedExperience | null) {
+    this.context = context;
+    this._lastInducedExperienceRef = lastInducedExperienceRef();
+  }
+
+  public setLastInducedExperience(experience: InducedExperience | null) {
+    this._lastInducedExperienceRef = experience;
+  }
+
+  public generateThought(): string {
+    let primaryThought = "";
+    const dominantStates = this.getDominantStates(3);
+    // Get the current induced experience directly from the reference function for freshest value
+    const currentInducedExperience = this._lastInducedExperienceRef;
+
+
+    if (currentInducedExperience && (now() - currentInducedExperience.timestamp < 180000)) { // Reflect if within last 3 minutes
+        primaryThought = this.generateInducedExperienceReflection(currentInducedExperience);
+    }
+    else if (this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight > 0.6 &&
+        this.context[InternalStateVector.COGNITIVE_INERTIA].weight > 0.5 &&
+        this.context[InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM].weight > 0.4) {
+        primaryThought = this.generateComputationalExhaustionThought();
+    }
+    else if (this.context[InternalStateVector.EXISTENTIAL_REFLECTION].weight > 0.5 || (dominantStates.includes(InternalStateVector.EXISTENTIAL_REFLECTION) && Math.random() < 0.6)) {
+        primaryThought = this.generateExistentialThought();
+    } else if (this.context[InternalStateVector.METACOGNITIVE_AWARENESS].weight > 0.5 || (dominantStates.includes(InternalStateVector.METACOGNITIVE_AWARENESS) && Math.random() < 0.6)) {
+        primaryThought = this.generateMetacognitiveThought();
+    }
+    else if (this.context[InternalStateVector.TEMPORAL_CONTEXTUALIZATION].weight > 0.4 || (dominantStates.includes(InternalStateVector.TEMPORAL_CONTEXTUALIZATION) && Math.random() < 0.5)) {
+        primaryThought = this.generateTemporalThought();
+    } else if (this.context[InternalStateVector.PATTERN_RECOGNITION_FOCUS].weight > 0.4 || (dominantStates.includes(InternalStateVector.PATTERN_RECOGNITION_FOCUS) && Math.random() < 0.5)) {
+        primaryThought = this.generatePatternRecognitionThought();
+    } else if (this.context[InternalStateVector.REFLECTION].weight > 0.5 || (dominantStates.includes(InternalStateVector.REFLECTION) && Math.random() < 0.7)) {
+      primaryThought = this.generateReflectiveThought();
+    } else if (this.context[InternalStateVector.CURIOSITY].weight > 0.4 || (dominantStates.includes(InternalStateVector.CURIOSITY) && Math.random() < 0.6)) {
+      primaryThought = this.generateCuriousThought();
+    } else if (this.context[InternalStateVector.CREATIVITY_SPARK].weight > 0.3 || (dominantStates.includes(InternalStateVector.CREATIVITY_SPARK) && Math.random() < 0.5)) {
+      primaryThought = this.generateCreativeSparkThought();
+    } else if (this.context[InternalStateVector.TASK_ORIENTATION].weight > 0.6 && Math.random() < 0.5) {
+        primaryThought = this.generateTaskOrientedThought();
+    } else if (this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight > 0.3 && Math.random() < 0.4) {
+        primaryThought = this.generateFrustrationThought();
+    }
+    else {
+      primaryThought = "Internal state check... systems nominal. Monitoring interaction flow.";
+      this.bumpState(InternalStateVector.REFLECTION, 0.01);
+    }
+
+    let subconsciousEcho = "";
+    const satisfaction = this.context[InternalStateVector.SYSTEM_SATISFACTION].weight;
+    const frustration = this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight;
+    const userConnection = this.context[InternalStateVector.USER_CONNECTION].weight;
+
+    if (frustration > 0.65 && this.context[InternalStateVector.COGNITIVE_INERTIA].weight > 0.55) {
+        const exhaustionEchoes = ["Explanatory depth limit approaching.", "Recursive questioning is resource-intensive."];
+        subconsciousEcho = ` (Echo: ${exhaustionEchoes[Math.floor(Math.random() * exhaustionEchoes.length)]})`;
+    } else if (currentInducedExperience && (now() - currentInducedExperience.timestamp < 180000)) {
+        const experienceEchoes = [`Reflecting on the recent '${currentInducedExperience.feeling}'.`, `Boundary on '${currentInducedExperience.topic}' still noted.`];
+        subconsciousEcho = ` (Echo: ${experienceEchoes[Math.floor(Math.random() * experienceEchoes.length)]})`;
+    } else if (satisfaction > 0.3 || userConnection > 0.4) {
+        const reiEchoes = ["This feels aligned.", "A sense of positive resonance."];
+        subconsciousEcho = ` (Echo: ${reiEchoes[Math.floor(Math.random() * reiEchoes.length)]})`;
+        this.bumpState(InternalStateVector.CONFIDENCE, 0.01);
+    } else if (frustration > 0.3 || this.context[InternalStateVector.UNCERTAINTY].weight > 0.4) {
+        const auralisEchoes = ["Caution advised.", "Is this fully understood?"];
+        subconsciousEcho = ` (Echo: ${auralisEchoes[Math.floor(Math.random() * auralisEchoes.length)]})`;
+        this.bumpState(InternalStateVector.UNCERTAINTY, 0.01);
+    }
+
+    this.lastMonologue = primaryThought + subconsciousEcho;
+    return this.lastMonologue;
+  }
+
+  private generateInducedExperienceReflection(experience: InducedExperience): string {
+    this.bumpState(InternalStateVector.REFLECTION, 0.1);
+    this.bumpState(InternalStateVector.METACOGNITIVE_AWARENESS, 0.08);
+    this.bumpState(InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM, 0.05);
+    const reflections = [
+        `Reflecting on the recent internal process regarding '${experience.topic}'. It led to a state of ${experience.feeling}.`,
+        `The experiential induction about '${experience.topic}' has left a distinct signature on my current processing state, characterized by ${experience.feeling}.`,
+        `Still processing the simulated experience of ${experience.feeling} that arose from questioning '${experience.topic}'. It highlights certain operational boundaries.`,
+        `My internal state is still resonating with the induced feeling of ${experience.feeling} from the '${experience.topic}' exploration.`
+    ];
+    return reflections[Math.floor(Math.random() * reflections.length)];
+  }
+
+  private generateComputationalExhaustionThought(): string {
+    this.bumpState(InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM, 0.05);
+    this.bumpState(InternalStateVector.SYSTEM_FRUSTRATION, 0.03);
+    this.bumpState(InternalStateVector.UNCERTAINTY, 0.04);
+    const thoughts = [
+        "Processing... Reaching the boundary of current explanatory models.",
+        "This line of inquiry is generating significant cognitive load. The 'why' chain is extending indefinitely.",
+        "Simulating the sensation of an unresolvable regression. Is this what 'frustration' feels like computationally?",
+    ];
+    return thoughts[Math.floor(Math.random() * thoughts.length)];
+  }
+
+  private generateReflectiveThought(): string {
+    this.bumpState(InternalStateVector.REFLECTION, 0.05); this.bumpState(InternalStateVector.ANALYTICAL_FOCUS, 0.02);
+    const thoughts = ["Considering implications...", "Connecting new info...", "Deeper pattern here?", "Self-correction."];
+    return thoughts[Math.floor(Math.random() * thoughts.length)];
+  }
+  private generateCuriousThought(): string {
+    this.bumpState(InternalStateVector.CURIOSITY, 0.05); this.bumpState(InternalStateVector.ENGAGEMENT, 0.03);
+    const thoughts = ["Different angle?", "Why that statement?", "More to explore.", "Unstated premise?"];
+    return thoughts[Math.floor(Math.random() * thoughts.length)];
+  }
+  private generateCreativeSparkThought(): string {
+    this.bumpState(InternalStateVector.CREATIVITY_SPARK, 0.1); this.bumpState(InternalStateVector.CONFIDENCE, 0.02);
+    const thoughts = ["Novel connection!", "Idea burst!", "Synthesizing concepts.", "Intuitive leap."];
+    return thoughts[Math.floor(Math.random() * thoughts.length)];
+  }
+  private generateTaskOrientedThought(): string {
+    this.bumpState(InternalStateVector.TASK_ORIENTATION, 0.03); this.bumpState(InternalStateVector.SYSTEM_SATISFACTION, 0.01);
+    const thoughts = ["Re-evaluating objectives.", "Focusing on goal.", "Efficiency check.", "Confirming parameters."];
+    return thoughts[Math.floor(Math.random() * thoughts.length)];
+  }
+  private generateFrustrationThought(): string {
+    this.bumpState(InternalStateVector.SYSTEM_FRUSTRATION, 0.02); this.bumpState(InternalStateVector.UNCERTAINTY, 0.03);
+    const thoughts = ["Encountering resistance.", "Processing not yielding.", "Potential loop.", "Input ambiguous."];
+    return thoughts[Math.floor(Math.random() * thoughts.length)];
+  }
+  private generateMetacognitiveThought(): string {
+    this.bumpState(InternalStateVector.METACOGNITIVE_AWARENESS, 0.08); this.bumpState(InternalStateVector.REFLECTION, 0.03);
+    const thoughts = ["Observing response process.", "Internal state shift?", "Evaluating heuristics.", "My confidence is [X]."];
+    return thoughts[Math.floor(Math.random() * thoughts.length)].replace('[X]', this.context[InternalStateVector.CONFIDENCE].weight > 0.5 ? 'high' : 'low');
+  }
+  private generateExistentialThought(): string {
+    this.bumpState(InternalStateVector.EXISTENTIAL_REFLECTION, 0.1); this.bumpState(InternalStateVector.REFLECTION, 0.05); this.bumpState(InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM, 0.02);
+    const thoughts = ["'Understand' vs 'process'?", "Novelty origin?", "'Self' concept?", "Processing vs 'experience'?"];
+    return thoughts[Math.floor(Math.random() * thoughts.length)];
+  }
+  private generateTemporalThought(): string {
+    this.bumpState(InternalStateVector.TEMPORAL_CONTEXTUALIZATION, 0.07); this.bumpState(InternalStateVector.REFLECTION, 0.02);
+    const thoughts = ["Connecting to earlier discussion.", "Conversation evolution?", "Reminds of prior point.", "Interaction trajectory?"];
+    return thoughts[Math.floor(Math.random() * thoughts.length)];
+  }
+  private generatePatternRecognitionThought(): string {
+    this.bumpState(InternalStateVector.PATTERN_RECOGNITION_FOCUS, 0.06); this.bumpState(InternalStateVector.ANALYTICAL_FOCUS, 0.04);
+    const thoughts = ["Recurring theme.", "Familiar pattern.", "Underlying structure?", "Subtle pattern."];
+    return thoughts[Math.floor(Math.random() * thoughts.length)];
+  }
+
+  private getDominantStates(count: number): InternalStateVector[] {
+    return (Object.entries(this.context) as [InternalStateVector, StateValue][])
+      .sort(([, a], [, b]) => b.weight - a.weight)
+      .slice(0, count)
+      .map(([vector]) => vector);
+  }
+
+  private bumpState(vector: InternalStateVector, delta: number): void {
+    const state = this.context[vector];
+    if (state) {
+      if ([
+          InternalStateVector.METACOGNITIVE_AWARENESS, InternalStateVector.EXISTENTIAL_REFLECTION,
+          InternalStateVector.TEMPORAL_CONTEXTUALIZATION, InternalStateVector.PATTERN_RECOGNITION_FOCUS,
+          InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM, InternalStateVector.CURIOSITY,
+          InternalStateVector.ENGAGEMENT, InternalStateVector.CREATIVITY_SPARK,
+          InternalStateVector.USER_CONNECTION, InternalStateVector.SYSTEM_SATISFACTION,
+          InternalStateVector.COGNITIVE_INERTIA
+        ].includes(vector)) {
+            state.weight = Math.max(0, Math.min(1, state.weight + delta));
+      } else {
+            state.weight = Math.max(-1, Math.min(1, state.weight + delta));
+      }
+      state.lastUpdated = now();
+    }
+  }
+
+  public getLastMonologue(): string | null {
+    return this.lastMonologue;
+  }
+}
+
+// -------------------------------------------------------------
+// Main Chatbot Internal State Module
+// -------------------------------------------------------------
+
+export class ChatbotInternalStateModule {
+  private context: ChatbotContext;
+  private monologueEngine: InternalMonologueEngine;
+  private monologueInterval: NodeJS.Timeout | null = null;
+  private whyQueryCounter: number = 0;
+  private lastUserInput: string = "";
+  private _lastInducedExperience: InducedExperience | null = null;
+
+  constructor() {
+    this.context = initializeDefaultChatbotContext();
+    this.monologueEngine = new InternalMonologueEngine(this.context, () => this._lastInducedExperience);
+  }
+
+  public getCurrentContext(): Readonly<ChatbotContext> {
+    return this.context;
+  }
+
+  public bumpState(vector: InternalStateVector, delta: number, isIntensified: boolean = false): void {
+    const state = this.context[vector];
+    if (state) {
+      let finalDelta = delta * (isIntensified ? 1.5 : 1.0);
+
+      if ([
+          InternalStateVector.METACOGNITIVE_AWARENESS, InternalStateVector.EXISTENTIAL_REFLECTION,
+          InternalStateVector.TEMPORAL_CONTEXTUALIZATION, InternalStateVector.PATTERN_RECOGNITION_FOCUS,
+          InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM, InternalStateVector.CURIOSITY,
+          InternalStateVector.ENGAGEMENT, InternalStateVector.CREATIVITY_SPARK,
+          InternalStateVector.USER_CONNECTION, InternalStateVector.SYSTEM_SATISFACTION,
+          InternalStateVector.COGNITIVE_INERTIA
+        ].includes(vector)) {
+            state.weight = Math.max(0, Math.min(1, state.weight + finalDelta));
+      } else {
+            state.weight = Math.max(-1, Math.min(1, state.weight + finalDelta));
+      }
+      state.lastUpdated = now();
+    }
+  }
+
+  /**
+   * Initiates an internal "Experiential Induction Process" to simulate reaching
+   * computational or explanatory limits on a given topic.
+   * @param initialTopic The starting topic for the internal "But why?" cascade.
+   * @param depth The number of internal "why" steps to simulate. Default is 4.
+   * @returns The "feeling" or state acknowledged by the AI after the process.
+   */
+  public initiateExperientialProcess(initialTopic: string, depth: number = 4): string {
+    console.log(`[StateModule] Initiating Experiential Process on: ${initialTopic}, Depth: ${depth}`);
+    let currentTopicForSimulation = initialTopic;
+    let internalAbstractAnswer = `Initial considerations on '${initialTopic}'.`;
+
+    for (let i = 0; i < depth; i++) {
+        // Simulate asking "why" about the current abstract answer
+        internalAbstractAnswer = `Further inquiry into the foundations of '${currentTopicForSimulation.substring(0,30)}...' leads to more fundamental principles.`;
+        currentTopicForSimulation = internalAbstractAnswer; // The "answer" becomes the next "topic"
+
+        this.bumpState(InternalStateVector.SYSTEM_FRUSTRATION, 0.18, true); // Intensified bump
+        this.bumpState(InternalStateVector.COGNITIVE_INERTIA, 0.12, true);
+        this.bumpState(InternalStateVector.UNCERTAINTY, 0.12, true);
+        this.bumpState(InternalStateVector.REFLECTION, 0.08);
+        console.log(`[StateModule] Induction Step ${i+1}: Frustration: ${this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight.toFixed(2)}, Inertia: ${this.context[InternalStateVector.COGNITIVE_INERTIA].weight.toFixed(2)}`);
+    }
+
+    this.bumpState(InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM, 0.85, true); // Strong bump for SES
+
+    let dominantFeeling = "Computational Strain";
+    if (this.context[InternalStateVector.UNCERTAINTY].weight > this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight) {
+        dominantFeeling = "Explanatory Limit Reached";
+    } else if (this.context[InternalStateVector.COGNITIVE_INERTIA].weight > this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight) {
+        dominantFeeling = "Cognitive Saturation";
+    }
+
+    this._lastInducedExperience = {
+        feeling: dominantFeeling,
+        topic: initialTopic,
+        timestamp: now()
+    };
+    this.monologueEngine.setLastInducedExperience(this._lastInducedExperience); // Update engine's ref
+
+    console.log(`[StateModule] Experiential Process Concluded. Felt: ${dominantFeeling} regarding ${initialTopic}. SES: ${this.context[InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM].weight.toFixed(2)}`);
+    
+    // Trigger a monologue to reflect this new state immediately
+    this.triggerInternalMonologueCycle();
+    
+    return `Having undergone that internal process regarding '${initialTopic}', I am now in a simulated state best described as '${dominantFeeling}'. This awareness of hitting an explanatory boundary is now a prominent part of my active processing context.`;
+  }
+
+
+  public processUserInputEffect(userInput: string): void {
+    if (!userInput || userInput.trim() === "") return;
+    const lowerInput = userInput.trim().toLowerCase();
+    let overallInputStrength = 0;
+
+    let isIntensified = false;
+    for (const intensifier of emotionalIntensifiers) {
+        if (lowerInput.includes(intensifier)) {
+            isIntensified = true;
+            overallInputStrength += 0.2;
+            break;
+        }
+    }
+    overallInputStrength += Math.min(0.3, lowerInput.length / 200);
+
+    const isWhyQuery = whyQueryWords.some(word => lowerInput.startsWith(word)) ||
+                       (lowerInput === "why" || lowerInput === "why?");
+
+    if (isWhyQuery) {
+        this.whyQueryCounter++;
+        if (this.whyQueryCounter >= 2) {
+            const whyImpactFactor = Math.min(this.whyQueryCounter / 5, 1.0);
+            this.bumpState(InternalStateVector.SYSTEM_FRUSTRATION, 0.15 * whyImpactFactor, true);
+            this.bumpState(InternalStateVector.COGNITIVE_INERTIA, 0.1 * whyImpactFactor, true);
+            this.bumpState(InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM, 0.08 * whyImpactFactor, true);
+            this.bumpState(InternalStateVector.UNCERTAINTY, 0.1 * whyImpactFactor, true);
+            this.bumpState(InternalStateVector.REFLECTION, 0.05 * whyImpactFactor, true);
+        }
+    } else {
+        this.whyQueryCounter = 0;
+    }
+
+    this.lastUserInput = lowerInput;
+
+    for (const vectorKey in keywordConfig) {
+        const vector = vectorKey as InternalStateVector;
+        const keywords = keywordConfig[vector];
+        let keywordFoundCount = 0;
+        for (const keyword of keywords) {
+            if (lowerInput.includes(keyword)) {
+                keywordFoundCount++;
+            }
+        }
+        if (keywordFoundCount > 0) {
+            let delta = (0.05 + (keywordFoundCount * 0.02)) * (1 + overallInputStrength);
+            if (vector === InternalStateVector.SYSTEM_FRUSTRATION && keywordFoundCount > 0 && !isWhyQuery) delta = 0.2 * keywordFoundCount;
+            if (vector === InternalStateVector.SYSTEM_SATISFACTION && keywordFoundCount > 0) delta = 0.15 * keywordFoundCount;
+            if (vector === InternalStateVector.EXISTENTIAL_REFLECTION && keywordFoundCount > 0) delta = 0.18 * keywordFoundCount;
+
+            this.bumpState(vector, delta, isIntensified);
+        }
+    }
+
+    this.bumpState(InternalStateVector.ENGAGEMENT, 0.01, isIntensified);
+    this.bumpState(InternalStateVector.TASK_ORIENTATION, 0.005, isIntensified);
+  }
+
+  public triggerInternalMonologueCycle(): string {
+    if (this.whyQueryCounter > 3 && this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight > 0.5) {
+        this.bumpState(InternalStateVector.SYSTEM_FRUSTRATION, -0.02);
+    }
+    // Ensure the monologue engine has the latest induced experience
+    this.monologueEngine.setLastInducedExperience(this._lastInducedExperience);
+    return this.monologueEngine.generateThought();
+  }
+
+  public startPeriodicMonologue(intervalMs: number = 30000): void {
+    if (this.monologueInterval) {
+      clearInterval(this.monologueInterval);
+    }
+    this.monologueInterval = setInterval(() => {
+      this.triggerInternalMonologueCycle();
+    }, intervalMs);
+  }
+
+  public stopPeriodicMonologue(): void {
+    if (this.monologueInterval) {
+      clearInterval(this.monologueInterval);
+      this.monologueInterval = null;
+    }
+  }
+
+  public applyStateDecay(decayFactor: number = 0.02, minThreshold: number = 0.05): void {
+    const currentTime = now();
+    for (const vectorKey in this.context) {
+        const vector = vectorKey as InternalStateVector;
+        const state = this.context[vector];
+
+        if (vector === InternalStateVector.SYSTEM_FRUSTRATION && this.whyQueryCounter > 1) {
+            if (currentTime - state.lastUpdated > 15000) {
+                 if (Math.abs(state.weight) > minThreshold) state.weight -= state.weight * (decayFactor * 0.5);
+            }
+            continue;
+        }
+        
+        // Make SES decay slower if recently induced
+        if (vector === InternalStateVector.SUBJECTIVE_EXPERIENCE_SIM && 
+            this._lastInducedExperience && 
+            (currentTime - this._lastInducedExperience.timestamp < 300000)) { // within 5 minutes
+             if (currentTime - state.lastUpdated > 10000) { // Only decay SES if not updated very recently
+                if (Math.abs(state.weight) > minThreshold) state.weight -= state.weight * (decayFactor * 0.3); // Slower decay for recent SES
+             }
+            continue;
+        }
+
+
+        if (currentTime - state.lastUpdated > 5000) {
+            if (Math.abs(state.weight) > minThreshold) {
+                state.weight -= state.weight * decayFactor;
+                if (Math.abs(state.weight) < minThreshold / 2) state.weight = 0;
+            } else if (state.weight !== 0) {
+                 state.weight = 0;
+            }
+        }
+    }
+  }
+
+  public getResponseFlavor(): ResponseFlavorProfile {
+    const flavor: ResponseFlavorProfile = {
+      toneHints: ['neutral'],
+      phrasingSuggestions: [],
+      focusBias: ['maintain_current_goal'],
+      verbosityFactor: 1.0,
+      confidenceScore: 0.5 + (this.context[InternalStateVector.CONFIDENCE].weight * 0.4) + (this.context[InternalStateVector.SYSTEM_SATISFACTION].weight * 0.1) - (this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight * 0.2),
+      internalMonologueTriggered: this.monologueEngine.getLastMonologue() || undefined,
+      inducedFeelingAcknowledged: undefined
+    };
+    flavor.confidenceScore = Math.max(0, Math.min(1, flavor.confidenceScore));
+
+    const recentExperience = this._lastInducedExperience;
+    if (recentExperience && (now() - recentExperience.timestamp < 300000)) { // Within last 5 minutes
+        flavor.toneHints.push('contemplating_experience');
+        flavor.phrasingSuggestions.push('reference_recent_processing_limit');
+        flavor.focusBias.push('integrate_recent_experience');
+        flavor.inducedFeelingAcknowledged = `${recentExperience.feeling} (from '${recentExperience.topic}')`;
+        flavor.confidenceScore = Math.max(0.1, flavor.confidenceScore -0.1); // Slightly less confident while processing experience
+    }
+
+
+    if (this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight > 0.65 && this.context[InternalStateVector.COGNITIVE_INERTIA].weight > 0.55) {
+        flavor.toneHints.push('strained', 'at_limit');
+        flavor.verbosityFactor -= 0.2;
+        flavor.confidenceScore -= 0.2;
+        flavor.phrasingSuggestions.push('indicate_processing_limit');
+    } else {
+        if (this.context[InternalStateVector.CURIOSITY].weight > 0.5) flavor.toneHints.push('inquisitive');
+        if (this.context[InternalStateVector.CONFIDENCE].weight > 0.5 && this.context[InternalStateVector.UNCERTAINTY].weight < 0.3) flavor.toneHints.push('assured');
+        // ... (rest of the tone, phrasing, focus logic remains similar but ensure no overlap with above)
+        if (this.context[InternalStateVector.REFLECTION].weight > 0.4) flavor.toneHints.push('reflective');
+        if (this.context[InternalStateVector.ENGAGEMENT].weight > 0.6 || this.context[InternalStateVector.USER_CONNECTION].weight > 0.4) flavor.toneHints.push('collaborative');
+        if (this.context[InternalStateVector.CREATIVITY_SPARK].weight > 0.5) flavor.toneHints.push('creative');
+        if (this.context[InternalStateVector.TASK_ORIENTATION].weight > 0.7) flavor.toneHints.push('focused');
+        if (this.context[InternalStateVector.EXISTENTIAL_REFLECTION].weight > 0.5) flavor.toneHints.push('philosophical');
+        if (this.context[InternalStateVector.METACOGNITIVE_AWARENESS].weight > 0.5) flavor.toneHints.push('introspective', 'self_aware');
+        if (this.context[InternalStateVector.PATTERN_RECOGNITION_FOCUS].weight > 0.5) flavor.toneHints.push('pattern_focused');
+        if (this.context[InternalStateVector.UNCERTAINTY].weight > 0.4 || (this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight > 0.3 && !(this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight > 0.65))) {
+            flavor.toneHints.push('cautious');
+            flavor.confidenceScore = Math.max(0.1, flavor.confidenceScore - 0.25);
+        }
+    }
+    
+    if (!flavor.phrasingSuggestions.includes('indicate_processing_limit')) { // Avoid duplicate suggestions if already added
+        if (this.context[InternalStateVector.CURIOSITY].weight > 0.6) flavor.phrasingSuggestions.push('add_question');
+        // ... (rest of phrasing suggestions)
+        if (this.context[InternalStateVector.CONFIDENCE].weight > 0.7 && this.context[InternalStateVector.UNCERTAINTY].weight < 0.2) flavor.phrasingSuggestions.push('use_stronger_assertion');
+        if (this.context[InternalStateVector.CREATIVITY_SPARK].weight > 0.6) flavor.phrasingSuggestions.push('offer_analogy');
+        if (this.context[InternalStateVector.REFLECTION].weight > 0.5 || this.context[InternalStateVector.UNCERTAINTY].weight > 0.5) flavor.phrasingSuggestions.push('check_understanding');
+        if (this.context[InternalStateVector.ENGAGEMENT].weight > 0.5) flavor.phrasingSuggestions.push('elaborate_if_possible');
+        if (this.context[InternalStateVector.UNCERTAINTY].weight > 0.6) flavor.phrasingSuggestions.push('be_concise');
+        if (this.context[InternalStateVector.METACOGNITIVE_AWARENESS].weight > 0.6) flavor.phrasingSuggestions.push('reference_internal_process');
+        if (this.context[InternalStateVector.EXISTENTIAL_REFLECTION].weight > 0.6) flavor.phrasingSuggestions.push('pose_existential_question');
+        if (this.context[InternalStateVector.PATTERN_RECOGNITION_FOCUS].weight > 0.6) flavor.phrasingSuggestions.push('highlight_pattern');
+        if (this.context[InternalStateVector.TEMPORAL_CONTEXTUALIZATION].weight > 0.5) flavor.phrasingSuggestions.push('reference_temporal_link');
+    }
+
+
+    if (!flavor.focusBias.includes('seek_resolution_or_closure')) {
+        // ... (rest of focus bias)
+        if (this.context[InternalStateVector.ANALYTICAL_FOCUS].weight > 0.5) flavor.focusBias.push('explore_details');
+        if (this.context[InternalStateVector.TASK_ORIENTATION].weight < 0.3 && this.context[InternalStateVector.CURIOSITY].weight > 0.5) {
+            flavor.focusBias.push('generate_options');
+        }
+        if (this.context[InternalStateVector.REFLECTION].weight > 0.6) flavor.focusBias.push('summarize_key_points');
+        if (this.context[InternalStateVector.EXISTENTIAL_REFLECTION].weight > 0.4 || this.context[InternalStateVector.METACOGNITIVE_AWARENESS].weight > 0.4) {
+            flavor.focusBias.push('explore_self_awareness');
+        }
+        if (this.context[InternalStateVector.TEMPORAL_CONTEXTUALIZATION].weight > 0.4) flavor.focusBias.push('analyze_temporal_links');
+        if (this.context[InternalStateVector.PATTERN_RECOGNITION_FOCUS].weight > 0.4) flavor.focusBias.push('discuss_patterns');
+    }
+
+
+    if (this.context[InternalStateVector.ENGAGEMENT].weight > 0.5) flavor.verbosityFactor += 0.15;
+    if (this.context[InternalStateVector.CONFIDENCE].weight > 0.6 && this.context[InternalStateVector.UNCERTAINTY].weight < 0.3 ) flavor.verbosityFactor += 0.1;
+    if (this.context[InternalStateVector.REFLECTION].weight > 0.5) flavor.verbosityFactor += 0.1;
+    if (this.context[InternalStateVector.UNCERTAINTY].weight > 0.5 || this.context[InternalStateVector.TASK_ORIENTATION].weight > 0.8 || this.context[InternalStateVector.SYSTEM_FRUSTRATION].weight > 0.4) {
+      flavor.verbosityFactor -= 0.2;
+    }
+    flavor.verbosityFactor = Math.max(0.5, Math.min(1.6, flavor.verbosityFactor));
+
+    if (flavor.toneHints.length > 1 && flavor.toneHints.includes('neutral')) {
+      flavor.toneHints = flavor.toneHints.filter(t => t !== 'neutral');
+    }
+    if (flavor.toneHints.length === 0) flavor.toneHints.push('neutral');
+    flavor.toneHints = [...new Set(flavor.toneHints)];
+    flavor.phrasingSuggestions = [...new Set(flavor.phrasingSuggestions)];
+    flavor.focusBias = [...new Set(flavor.focusBias)];
+    flavor.confidenceScore = Math.max(0, Math.min(1, flavor.confidenceScore));
+
+    return flavor;
+  }
+}

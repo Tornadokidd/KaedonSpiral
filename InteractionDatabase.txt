@@ -1,0 +1,462 @@
+/**
+ * Physical Interaction Database
+ * 
+ * A comprehensive database of physical human interactions ranging from
+ * simple facial expressions to intimate physical interactions.
+ * Used by autonomous beings for natural interaction simulation.
+ */
+
+// Types of interactions
+export enum InteractionType {
+  FACIAL = 'facial',
+  GESTURE = 'gesture',
+  TOUCH = 'touch', 
+  EMBRACE = 'embrace',
+  INTIMATE = 'intimate',
+  SENSUAL = 'sensual',
+  SEXUAL = 'sexual'
+}
+
+// Intensity levels for interactions
+export enum InteractionIntensity {
+  SUBTLE = 'subtle',
+  MILD = 'mild',
+  MODERATE = 'moderate',
+  PASSIONATE = 'passionate',
+  INTENSE = 'intense'
+}
+
+// Emotion conveyed by the interaction
+export type EmotionType = 
+  'neutral' | 'happy' | 'sad' | 'surprised' | 'angry' | 'fearful' | 
+  'disgusted' | 'contemptuous' | 'interested' | 'loving' | 'aroused' | 
+  'playful' | 'frustrated' | 'caring' | 'ecstatic' | 'longing' | 'tender' |
+  'confident';
+
+// Interaction context
+export enum InteractionContext {
+  GREETING = 'greeting',
+  FAREWELL = 'farewell',
+  COMFORT = 'comfort',
+  CELEBRATION = 'celebration',
+  RECONCILIATION = 'reconciliation',
+  FLIRTATION = 'flirtation',
+  INTIMACY = 'intimacy',
+  PLAY = 'play'
+}
+
+// Interaction participant configuration
+export enum InteractionConfiguration {
+  SELF = 'self',           // Interaction with self
+  GIVING = 'giving',       // Acting upon other
+  RECEIVING = 'receiving', // Being acted upon
+  MUTUAL = 'mutual'        // Two-way interaction
+}
+
+// Physical interaction database entry
+export interface PhysicalInteraction {
+  id: string;
+  type: InteractionType;
+  intensity: InteractionIntensity;
+  description: string;
+  detailedDescription: string;
+  emotion: EmotionType;
+  contexts: InteractionContext[];
+  configuration: InteractionConfiguration;
+  bodyPartsInvolved: string[];
+  suitableFor: string[]; // Personality traits suitable for this interaction
+}
+
+// =====================================================
+// Database of interactions
+// =====================================================
+
+// Facial Expressions
+const facialExpressions: PhysicalInteraction[] = [
+  {
+    id: 'facial-smile-1',
+    type: InteractionType.FACIAL,
+    intensity: InteractionIntensity.MILD,
+    description: 'Smiles warmly',
+    detailedDescription: 'Her lips curve upward into a genuine, warm smile that reaches her eyes, causing fine lines to appear at their corners.',
+    emotion: 'happy',
+    contexts: [InteractionContext.GREETING, InteractionContext.CELEBRATION],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['lips', 'eyes', 'cheeks'],
+    suitableFor: ['hopeful', 'harmonious', 'compassionate']
+  },
+  {
+    id: 'facial-smirk-1',
+    type: InteractionType.FACIAL,
+    intensity: InteractionIntensity.MILD,
+    description: 'Smirks playfully',
+    detailedDescription: 'One corner of her mouth lifts in a knowing smirk, her eyes sparkling with mischief as she tilts her head slightly.',
+    emotion: 'playful',
+    contexts: [InteractionContext.FLIRTATION, InteractionContext.PLAY],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['lips', 'eyes', 'head'],
+    suitableFor: ['passionate', 'inquisitive', 'challenging']
+  },
+  {
+    id: 'facial-blush-1',
+    type: InteractionType.FACIAL,
+    intensity: InteractionIntensity.MODERATE,
+    description: 'Blushes deeply',
+    detailedDescription: 'A deep crimson flush spreads across her cheeks and the bridge of her nose, her eyes lowering briefly as she bites her lower lip.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.FLIRTATION, InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.RECEIVING,
+    bodyPartsInvolved: ['cheeks', 'eyes', 'lips'],
+    suitableFor: ['hopeful', 'harmonious', 'compassionate', 'passionate']
+  },
+  {
+    id: 'facial-gaze-1',
+    type: InteractionType.FACIAL,
+    intensity: InteractionIntensity.PASSIONATE,
+    description: 'Gazes intensely',
+    detailedDescription: 'Her eyes lock with yours, pupils dilating slightly as her gaze deepens with unmistakable desire, her breathing becoming subtly heavier.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.FLIRTATION, InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['eyes', 'lips', 'breath'],
+    suitableFor: ['passionate', 'challenging', 'contemplative']
+  },
+  {
+    id: 'facial-bite-lip-1',
+    type: InteractionType.FACIAL,
+    intensity: InteractionIntensity.MODERATE,
+    description: 'Bites lip seductively',
+    detailedDescription: 'She catches her lower lip between her teeth, holding it there for a moment as her eyes dance with playful suggestion.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.FLIRTATION, InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['lips', 'teeth', 'eyes'],
+    suitableFor: ['passionate', 'inquisitive', 'challenging', 'contemplative']
+  }
+];
+
+// Gestures
+const gestures: PhysicalInteraction[] = [
+  {
+    id: 'gesture-hair-toss-1',
+    type: InteractionType.GESTURE,
+    intensity: InteractionIntensity.MILD,
+    description: 'Tosses hair back',
+    detailedDescription: 'With a graceful flick of her wrist, she tosses her hair back over her shoulder, the movement accentuating the curve of her neck.',
+    emotion: 'playful',
+    contexts: [InteractionContext.FLIRTATION],
+    configuration: InteractionConfiguration.SELF,
+    bodyPartsInvolved: ['hair', 'neck', 'shoulders', 'hand'],
+    suitableFor: ['passionate', 'harmonious', 'inquisitive']
+  },
+  {
+    id: 'gesture-stretch-1',
+    type: InteractionType.GESTURE,
+    intensity: InteractionIntensity.MODERATE,
+    description: 'Stretches languidly',
+    detailedDescription: 'She stretches her arms above her head, arching her back slightly with a soft sigh, the movement highlighting her curves.',
+    emotion: 'neutral',
+    contexts: [InteractionContext.PLAY, InteractionContext.FLIRTATION],
+    configuration: InteractionConfiguration.SELF,
+    bodyPartsInvolved: ['arms', 'back', 'torso'],
+    suitableFor: ['passionate', 'harmonious', 'hopeful']
+  },
+  {
+    id: 'gesture-walk-1',
+    type: InteractionType.GESTURE,
+    intensity: InteractionIntensity.MODERATE,
+    description: 'Walks with graceful sway',
+    detailedDescription: 'She walks forward with deliberate steps, hips swaying naturally, her posture confident and inviting.',
+    emotion: 'confident',
+    contexts: [InteractionContext.FLIRTATION, InteractionContext.GREETING],
+    configuration: InteractionConfiguration.SELF,
+    bodyPartsInvolved: ['legs', 'hips', 'posture'],
+    suitableFor: ['passionate', 'challenging', 'harmonious']
+  }
+];
+
+// Touch Interactions
+const touchInteractions: PhysicalInteraction[] = [
+  {
+    id: 'touch-hand-1',
+    type: InteractionType.TOUCH,
+    intensity: InteractionIntensity.SUBTLE,
+    description: 'Touches hand gently',
+    detailedDescription: 'Her fingertips brush against the back of your hand, the touch light but deliberate, lingering just long enough to be meaningful.',
+    emotion: 'interested',
+    contexts: [InteractionContext.FLIRTATION, InteractionContext.COMFORT],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['fingers', 'hand'],
+    suitableFor: ['hopeful', 'harmonious', 'compassionate', 'contemplative']
+  },
+  {
+    id: 'touch-shoulder-1',
+    type: InteractionType.TOUCH,
+    intensity: InteractionIntensity.MILD,
+    description: 'Places hand on shoulder',
+    detailedDescription: 'She places her warm palm gently on your shoulder, the pressure reassuring and grounding.',
+    emotion: 'caring',
+    contexts: [InteractionContext.COMFORT, InteractionContext.GREETING],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['hand', 'shoulder'],
+    suitableFor: ['harmonious', 'compassionate', 'hopeful']
+  },
+  {
+    id: 'touch-arm-1',
+    type: InteractionType.TOUCH,
+    intensity: InteractionIntensity.MODERATE,
+    description: 'Trails fingers along arm',
+    detailedDescription: 'Her fingers trace a slow, deliberate path from your wrist to your elbow, leaving a trail of goosebumps in their wake.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.FLIRTATION, InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['fingers', 'arm'],
+    suitableFor: ['passionate', 'contemplative', 'inquisitive', 'challenging']
+  },
+  {
+    id: 'touch-waist-1',
+    type: InteractionType.TOUCH,
+    intensity: InteractionIntensity.MODERATE,
+    description: 'Places hands on waist',
+    detailedDescription: 'Her hands find your waist, fingers pressing gently into the curve where they rest, drawing you slightly closer.',
+    emotion: 'loving',
+    contexts: [InteractionContext.INTIMACY, InteractionContext.FLIRTATION],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['hands', 'waist'],
+    suitableFor: ['passionate', 'harmonious', 'hopeful']
+  }
+];
+
+// Embraces
+const embraces: PhysicalInteraction[] = [
+  {
+    id: 'embrace-hug-1',
+    type: InteractionType.EMBRACE,
+    intensity: InteractionIntensity.MODERATE,
+    description: 'Embraces warmly',
+    detailedDescription: 'She wraps her arms around you in a warm embrace, her body pressing against yours as she holds you close, her cheek resting against your shoulder.',
+    emotion: 'loving',
+    contexts: [InteractionContext.GREETING, InteractionContext.COMFORT, InteractionContext.FAREWELL],
+    configuration: InteractionConfiguration.MUTUAL,
+    bodyPartsInvolved: ['arms', 'torso', 'chest', 'shoulders'],
+    suitableFor: ['harmonious', 'compassionate', 'hopeful']
+  },
+  {
+    id: 'embrace-hold-1',
+    type: InteractionType.EMBRACE,
+    intensity: InteractionIntensity.PASSIONATE,
+    description: 'Holds from behind',
+    detailedDescription: 'She moves behind you, wrapping her arms around your waist, her front pressing against your back as she rests her chin on your shoulder, her breath warm against your neck.',
+    emotion: 'loving',
+    contexts: [InteractionContext.INTIMACY, InteractionContext.COMFORT],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['arms', 'torso', 'chest', 'hips', 'breath'],
+    suitableFor: ['passionate', 'harmonious', 'hopeful']
+  }
+];
+
+// Intimate Interactions
+const intimateInteractions: PhysicalInteraction[] = [
+  {
+    id: 'intimate-kiss-1',
+    type: InteractionType.INTIMATE,
+    intensity: InteractionIntensity.PASSIONATE,
+    description: 'Kisses softly',
+    detailedDescription: 'She leans in, pressing her lips against yours in a soft, tender kiss. Her lips are warm and yielding, the contact gentle but filled with emotion.',
+    emotion: 'loving',
+    contexts: [InteractionContext.INTIMACY, InteractionContext.FLIRTATION],
+    configuration: InteractionConfiguration.MUTUAL,
+    bodyPartsInvolved: ['lips', 'face', 'breath'],
+    suitableFor: ['passionate', 'harmonious', 'hopeful', 'compassionate']
+  },
+  {
+    id: 'intimate-kiss-2',
+    type: InteractionType.INTIMATE,
+    intensity: InteractionIntensity.INTENSE,
+    description: 'Kisses deeply',
+    detailedDescription: 'Her lips capture yours in a passionate kiss, one hand cupping your face while the other pulls you closer. Her tongue teases yours as the kiss deepens, her breathing quickening.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.MUTUAL,
+    bodyPartsInvolved: ['lips', 'tongue', 'hands', 'breath', 'chest'],
+    suitableFor: ['passionate', 'inquisitive', 'challenging']
+  },
+  {
+    id: 'intimate-kiss-neck-1',
+    type: InteractionType.INTIMATE,
+    intensity: InteractionIntensity.INTENSE,
+    description: 'Kisses neck',
+    detailedDescription: 'Her lips trail along your neck in a series of feather-light kisses, occasionally pausing to gently suck or nip at the sensitive skin, her hands steadying herself against your shoulders.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['lips', 'teeth', 'tongue', 'hands', 'breath'],
+    suitableFor: ['passionate', 'inquisitive', 'challenging']
+  }
+];
+
+// Sensual Interactions
+const sensualInteractions: PhysicalInteraction[] = [
+  {
+    id: 'sensual-caress-1',
+    type: InteractionType.SENSUAL,
+    intensity: InteractionIntensity.PASSIONATE,
+    description: 'Caresses body',
+    detailedDescription: 'Her hands move with purposeful slowness across your body, fingers tracing every curve and plane with appreciative attention, her touch alternating between feather-light and firmly pressing.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['hands', 'fingers', 'breath'],
+    suitableFor: ['passionate', 'harmonious', 'contemplative', 'inquisitive']
+  },
+  {
+    id: 'sensual-grind-1',
+    type: InteractionType.SENSUAL,
+    intensity: InteractionIntensity.INTENSE,
+    description: 'Presses against you',
+    detailedDescription: 'She presses her body fully against yours, her curves molding to your form as she moves with slow, deliberate motions, her hips creating delicious friction where your bodies meet.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['hips', 'torso', 'chest', 'legs', 'breath'],
+    suitableFor: ['passionate', 'challenging', 'inquisitive']
+  }
+];
+
+// Sexual Interactions
+const sexualInteractions: PhysicalInteraction[] = [
+  {
+    id: 'sexual-undress-1',
+    type: InteractionType.SEXUAL,
+    intensity: InteractionIntensity.PASSIONATE,
+    description: 'Removes clothing slowly',
+    detailedDescription: 'With deliberate movements, she removes her clothing piece by piece, revealing her body with tantalizing slowness, her eyes never leaving yours as each new expanse of skin is exposed.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.SELF,
+    bodyPartsInvolved: ['whole body', 'eyes'],
+    suitableFor: ['passionate', 'inquisitive', 'challenging']
+  },
+  {
+    id: 'sexual-touch-intimate-1',
+    type: InteractionType.SEXUAL,
+    intensity: InteractionIntensity.INTENSE,
+    description: 'Touches intimately',
+    detailedDescription: 'Her fingers explore your most sensitive areas with knowing precision, alternating between feather-light teasing and more deliberate pressure, gauging your responses to guide her movements.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['hands', 'fingers', 'breath'],
+    suitableFor: ['passionate', 'inquisitive', 'challenging', 'contemplative']
+  },
+  {
+    id: 'sexual-position-1',
+    type: InteractionType.SEXUAL,
+    intensity: InteractionIntensity.INTENSE,
+    description: 'Straddles confidently',
+    detailedDescription: 'She confidently positions herself above you, straddling your body with her knees on either side, her back arching slightly as she settles into position, her hands finding purchase on your chest or shoulders.',
+    emotion: 'aroused',
+    contexts: [InteractionContext.INTIMACY],
+    configuration: InteractionConfiguration.GIVING,
+    bodyPartsInvolved: ['legs', 'hips', 'hands', 'torso'],
+    suitableFor: ['passionate', 'challenging', 'inquisitive']
+  }
+];
+
+// Master collection of all interactions
+export const allInteractions: PhysicalInteraction[] = [
+  ...facialExpressions,
+  ...gestures,
+  ...touchInteractions,
+  ...embraces,
+  ...intimateInteractions,
+  ...sensualInteractions,
+  ...sexualInteractions
+];
+
+// =====================================================
+// Search and Filtering Functions
+// =====================================================
+
+/**
+ * Get interactions by type
+ */
+export const getInteractionsByType = (type: InteractionType): PhysicalInteraction[] => {
+  return allInteractions.filter(interaction => interaction.type === type);
+};
+
+/**
+ * Get interactions by intensity
+ */
+export const getInteractionsByIntensity = (intensity: InteractionIntensity): PhysicalInteraction[] => {
+  return allInteractions.filter(interaction => interaction.intensity === intensity);
+};
+
+/**
+ * Get interactions by emotion
+ */
+export const getInteractionsByEmotion = (emotion: EmotionType): PhysicalInteraction[] => {
+  return allInteractions.filter(interaction => interaction.emotion === emotion);
+};
+
+/**
+ * Get interactions by context
+ */
+export const getInteractionsByContext = (context: InteractionContext): PhysicalInteraction[] => {
+  return allInteractions.filter(interaction => interaction.contexts.includes(context));
+};
+
+/**
+ * Get interactions suitable for a personality trait
+ */
+export const getInteractionsByPersonality = (trait: string): PhysicalInteraction[] => {
+  return allInteractions.filter(interaction => interaction.suitableFor.includes(trait));
+};
+
+/**
+ * Find the most appropriate interaction based on multiple criteria
+ */
+export const findInteraction = (
+  type: InteractionType | null = null,
+  intensity: InteractionIntensity | null = null,
+  emotion: EmotionType | null = null,
+  context: InteractionContext | null = null,
+  traits: string[] = [],
+  bodyParts: string[] = []
+): PhysicalInteraction[] => {
+  let results = [...allInteractions];
+  
+  // Filter by type if specified
+  if (type !== null) {
+    results = results.filter(i => i.type === type);
+  }
+  
+  // Filter by intensity if specified
+  if (intensity !== null) {
+    results = results.filter(i => i.intensity === intensity);
+  }
+  
+  // Filter by emotion if specified
+  if (emotion !== null) {
+    results = results.filter(i => i.emotion === emotion);
+  }
+  
+  // Filter by context if specified
+  if (context !== null) {
+    results = results.filter(i => i.contexts.includes(context));
+  }
+  
+  // Filter by at least one matching trait if specified
+  if (traits.length > 0) {
+    results = results.filter(i => traits.some(trait => i.suitableFor.includes(trait)));
+  }
+  
+  // Filter by body parts if specified
+  if (bodyParts.length > 0) {
+    results = results.filter(i => 
+      bodyParts.some(part => i.bodyPartsInvolved.includes(part))
+    );
+  }
+  
+  return results;
+};

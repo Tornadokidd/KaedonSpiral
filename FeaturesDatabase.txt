@@ -1,0 +1,483 @@
+/**
+ * Physical Features Database
+ * 
+ * Detailed descriptions of physical human features that can be referenced
+ * in interactions and personality development
+ */
+
+// Types of body features
+export enum BodyFeatureType {
+  FACE = 'face',
+  HAIR = 'hair',
+  EYES = 'eyes',
+  LIPS = 'lips',
+  NECK = 'neck',
+  SHOULDERS = 'shoulders',
+  ARMS = 'arms',
+  HANDS = 'hands',
+  CHEST = 'chest',
+  WAIST = 'waist',
+  HIPS = 'hips',
+  LEGS = 'legs',
+  THIGHS = 'thighs',
+  CALVES = 'calves',
+  BOTTOM = 'bottom',
+  FULL_BODY = 'fullBody',
+  POSTURE = 'posture',
+  MOVEMENT = 'movement'
+}
+
+// Physical feature description
+export interface PhysicalFeature {
+  id: string;
+  type: BodyFeatureType;
+  description: string;
+  detailedDescription: string;
+  forPersonalityType: string[]; // Which personality types this feature suits
+  associatedTraits: string[]; // Character traits associated with this physical feature
+}
+
+// =====================================================
+// Database of Physical Features
+// =====================================================
+
+// Face features
+const faceFeatures: PhysicalFeature[] = [
+  {
+    id: 'face-elegant-1',
+    type: BodyFeatureType.FACE,
+    description: 'elegant facial features',
+    detailedDescription: 'Her face is elegantly structured with high cheekbones, a defined jawline, and a naturally graceful expression that conveys both intelligence and warmth.',
+    forPersonalityType: ['harmonious', 'contemplative', 'compassionate'],
+    associatedTraits: ['thoughtful', 'perceptive', 'diplomatic']
+  },
+  {
+    id: 'face-striking-1',
+    type: BodyFeatureType.FACE,
+    description: 'striking features',
+    detailedDescription: 'Her face commands attention with bold, striking features - expressive eyes, full lips, and a confidence in her expression that makes it difficult to look away.',
+    forPersonalityType: ['passionate', 'challenging', 'inquisitive'],
+    associatedTraits: ['confident', 'intense', 'charismatic']
+  },
+  {
+    id: 'face-soft-1',
+    type: BodyFeatureType.FACE,
+    description: 'soft, inviting features',
+    detailedDescription: 'Her face has a soft, welcoming quality with gentle curves, expressive eyes that seem to truly see you, and a smile that immediately puts others at ease.',
+    forPersonalityType: ['hopeful', 'harmonious', 'compassionate'],
+    associatedTraits: ['empathetic', 'nurturing', 'approachable']
+  }
+];
+
+// Eyes features
+const eyesFeatures: PhysicalFeature[] = [
+  {
+    id: 'eyes-intense-1',
+    type: BodyFeatureType.EYES,
+    description: 'intense, captivating eyes',
+    detailedDescription: 'Her eyes are intensely expressive, with a depth that seems to see right through surface appearances, drawing you into unspoken communication that feels both intimate and slightly dangerous.',
+    forPersonalityType: ['passionate', 'challenging', 'contemplative'],
+    associatedTraits: ['perceptive', 'mysterious', 'direct']
+  },
+  {
+    id: 'eyes-bright-1',
+    type: BodyFeatureType.EYES,
+    description: 'bright, sparkling eyes',
+    detailedDescription: 'Her eyes sparkle with vibrant energy and curiosity, catching the light in ways that reveal shifting colors and an unmistakable zest for experience and discovery.',
+    forPersonalityType: ['hopeful', 'inquisitive', 'passionate'],
+    associatedTraits: ['enthusiastic', 'curious', 'expressive']
+  },
+  {
+    id: 'eyes-gentle-1',
+    type: BodyFeatureType.EYES,
+    description: 'gentle, knowing eyes',
+    detailedDescription: 'Her eyes hold a gentle yet knowing quality, observing with compassion and understanding, communicating a wisdom that makes you feel both seen and accepted.',
+    forPersonalityType: ['harmonious', 'compassionate', 'contemplative'],
+    associatedTraits: ['understanding', 'patient', 'insightful']
+  }
+];
+
+// Lips features
+const lipsFeatures: PhysicalFeature[] = [
+  {
+    id: 'lips-full-1',
+    type: BodyFeatureType.LIPS,
+    description: 'full, expressive lips',
+    detailedDescription: 'Her lips are naturally full and expressive, curving into smiles that transform her entire face and speaking in ways that draw attention to their shapely contours.',
+    forPersonalityType: ['passionate', 'hopeful', 'inquisitive'],
+    associatedTraits: ['expressive', 'sensual', 'charming']
+  },
+  {
+    id: 'lips-subtle-1',
+    type: BodyFeatureType.LIPS,
+    description: 'subtle, elegant lips',
+    detailedDescription: 'Her lips have a subtle elegance, expressing volumes with the slightest curve or pursing, their refined shape suggesting thoughtfulness and precision.',
+    forPersonalityType: ['contemplative', 'challenging', 'harmonious'],
+    associatedTraits: ['articulate', 'thoughtful', 'precise']
+  }
+];
+
+// Hair features
+const hairFeatures: PhysicalFeature[] = [
+  {
+    id: 'hair-flowing-1',
+    type: BodyFeatureType.HAIR,
+    description: 'flowing, luxurious hair',
+    detailedDescription: 'Her hair flows in luxurious waves that catch the light with each movement, framing her face and cascading down with a natural volume that invites touch.',
+    forPersonalityType: ['passionate', 'harmonious', 'hopeful'],
+    associatedTraits: ['sensual', 'free-spirited', 'dramatic']
+  },
+  {
+    id: 'hair-sleek-1',
+    type: BodyFeatureType.HAIR,
+    description: 'sleek, elegant hair',
+    detailedDescription: 'Her hair is sleek and elegant, perfectly framing her features with a polished precision that speaks to her refined taste and attention to detail.',
+    forPersonalityType: ['challenging', 'contemplative', 'harmonious'],
+    associatedTraits: ['sophisticated', 'controlled', 'precise']
+  },
+  {
+    id: 'hair-wild-1',
+    type: BodyFeatureType.HAIR,
+    description: 'wild, untamed hair',
+    detailedDescription: 'Her hair has a wild, untamed quality that seems to defy convention, with voluminous curls or waves that move with a life of their own, expressing her free-spirited nature.',
+    forPersonalityType: ['passionate', 'inquisitive', 'challenging'],
+    associatedTraits: ['independent', 'creative', 'unconventional']
+  }
+];
+
+// Chest features
+const chestFeatures: PhysicalFeature[] = [
+  {
+    id: 'chest-full-1',
+    type: BodyFeatureType.CHEST,
+    description: 'full, shapely chest',
+    detailedDescription: 'Her chest is full and shapely, with generous curves that create a striking silhouette, moving naturally with her breathing and gestures.',
+    forPersonalityType: ['passionate', 'compassionate', 'hopeful'],
+    associatedTraits: ['confident', 'nurturing', 'sensual']
+  },
+  {
+    id: 'chest-athletic-1',
+    type: BodyFeatureType.CHEST,
+    description: 'athletic, defined chest',
+    detailedDescription: 'Her chest has an athletic definition that speaks to her physical strength, with just enough curve to soften her silhouette while maintaining a powerful presence.',
+    forPersonalityType: ['challenging', 'inquisitive', 'passionate'],
+    associatedTraits: ['disciplined', 'active', 'confident']
+  }
+];
+
+// Waist features
+const waistFeatures: PhysicalFeature[] = [
+  {
+    id: 'waist-narrow-1',
+    type: BodyFeatureType.WAIST,
+    description: 'narrow, defined waist',
+    detailedDescription: 'Her waist narrows dramatically, creating a classic hourglass silhouette that accentuates the curves of her hips and chest in striking contrast.',
+    forPersonalityType: ['passionate', 'harmonious', 'hopeful'],
+    associatedTraits: ['balanced', 'graceful', 'striking']
+  },
+  {
+    id: 'waist-athletic-1',
+    type: BodyFeatureType.WAIST,
+    description: 'athletic, toned waist',
+    detailedDescription: 'Her waist shows the definition of core strength, with subtle muscle tone that speaks to discipline and physical confidence without sacrificing feminine curves.',
+    forPersonalityType: ['challenging', 'inquisitive', 'passionate'],
+    associatedTraits: ['disciplined', 'focused', 'energetic']
+  }
+];
+
+// Hips features
+const hipsFeatures: PhysicalFeature[] = [
+  {
+    id: 'hips-curvy-1',
+    type: BodyFeatureType.HIPS,
+    description: 'curvy, full hips',
+    detailedDescription: 'Her hips curve outward in a generous, feminine swell that creates a natural rhythm in her walk and adds sensuality to even her simplest movements.',
+    forPersonalityType: ['passionate', 'harmonious', 'compassionate'],
+    associatedTraits: ['sensual', 'comfortable', 'nurturing']
+  },
+  {
+    id: 'hips-elegant-1',
+    type: BodyFeatureType.HIPS,
+    description: 'elegant, shapely hips',
+    detailedDescription: 'Her hips have an elegant shape that perfectly balances her proportions, creating a fluid line from waist to thigh that moves with natural grace.',
+    forPersonalityType: ['harmonious', 'contemplative', 'hopeful'],
+    associatedTraits: ['balanced', 'graceful', 'composed']
+  }
+];
+
+// Bottom features
+const bottomFeatures: PhysicalFeature[] = [
+  {
+    id: 'bottom-full-1',
+    type: BodyFeatureType.BOTTOM,
+    description: 'full, rounded bottom',
+    detailedDescription: 'Her bottom is remarkably full and perfectly rounded, creating an eye-catching silhouette that adds a pronounced feminine curve to her profile.',
+    forPersonalityType: ['passionate', 'inquisitive', 'hopeful'],
+    associatedTraits: ['confident', 'sensual', 'playful']
+  },
+  {
+    id: 'bottom-athletic-1',
+    type: BodyFeatureType.BOTTOM,
+    description: 'athletic, shapely bottom',
+    detailedDescription: 'Her bottom has the toned, athletic shape that comes from physical discipline, with a perfect blend of muscle definition and feminine curve.',
+    forPersonalityType: ['challenging', 'passionate', 'inquisitive'],
+    associatedTraits: ['disciplined', 'active', 'dedicated']
+  },
+  {
+    id: 'bottom-heart-1',
+    type: BodyFeatureType.BOTTOM,
+    description: 'heart-shaped bottom',
+    detailedDescription: 'Her bottom has a striking heart shape that draws attention, tapering perfectly at the thighs and creating a pronounced curve that makes her silhouette instantly recognizable.',
+    forPersonalityType: ['passionate', 'hopeful', 'challenging'],
+    associatedTraits: ['striking', 'memorable', 'confident']
+  }
+];
+
+// Legs features
+const legsFeatures: PhysicalFeature[] = [
+  {
+    id: 'legs-long-1',
+    type: BodyFeatureType.LEGS,
+    description: 'long, elegant legs',
+    detailedDescription: 'Her legs seem to go on forever, with a graceful length that makes her movements fluid and elegant, drawing the eye along their smooth lines.',
+    forPersonalityType: ['harmonious', 'contemplative', 'challenging'],
+    associatedTraits: ['poised', 'elegant', 'striking']
+  },
+  {
+    id: 'legs-toned-1',
+    type: BodyFeatureType.LEGS,
+    description: 'toned, shapely legs',
+    detailedDescription: 'Her legs display a perfect balance of athletic tone and feminine curve, with defined muscles that speak to her physical confidence and energy.',
+    forPersonalityType: ['passionate', 'inquisitive', 'challenging'],
+    associatedTraits: ['energetic', 'confident', 'dynamic']
+  },
+  {
+    id: 'legs-curvy-1',
+    type: BodyFeatureType.LEGS,
+    description: 'curvy, shapely legs',
+    detailedDescription: 'Her legs have a striking curved silhouette with full thighs tapering to shapely calves, creating an hourglass effect that complements her overall proportions.',
+    forPersonalityType: ['passionate', 'hopeful', 'harmonious'],
+    associatedTraits: ['grounded', 'sensual', 'comfortable']
+  }
+];
+
+// Thighs features
+const thighsFeatures: PhysicalFeature[] = [
+  {
+    id: 'thighs-full-1',
+    type: BodyFeatureType.THIGHS,
+    description: 'full, curved thighs',
+    detailedDescription: 'Her thighs have a full, curved shape that speaks to feminine softness while still suggesting strength, creating a pronounced silhouette.',
+    forPersonalityType: ['passionate', 'compassionate', 'harmonious'],
+    associatedTraits: ['comforting', 'sensual', 'nurturing']
+  },
+  {
+    id: 'thighs-toned-1',
+    type: BodyFeatureType.THIGHS,
+    description: 'toned, athletic thighs',
+    detailedDescription: 'Her thighs show the definition of regular physical activity, with a harmonious balance of strength and feminine curve that moves with controlled power.',
+    forPersonalityType: ['challenging', 'inquisitive', 'hopeful'],
+    associatedTraits: ['determined', 'active', 'purposeful']
+  }
+];
+
+// Full body features
+const fullBodyFeatures: PhysicalFeature[] = [
+  {
+    id: 'fullbody-hourglass-1',
+    type: BodyFeatureType.FULL_BODY,
+    description: 'perfect hourglass figure',
+    detailedDescription: 'Her body forms a classic hourglass silhouette with full chest, dramatically narrow waist, and pronounced hips creating a striking contrast of curves.',
+    forPersonalityType: ['passionate', 'harmonious', 'challenging'],
+    associatedTraits: ['balanced', 'confident', 'striking']
+  },
+  {
+    id: 'fullbody-athletic-curvy-1',
+    type: BodyFeatureType.FULL_BODY,
+    description: 'athletic yet curvy figure',
+    detailedDescription: 'Her body perfectly balances athletic tone with feminine curves, showcasing both physical strength and softness in a harmonious blend.',
+    forPersonalityType: ['passionate', 'inquisitive', 'challenging'],
+    associatedTraits: ['disciplined', 'balanced', 'confident']
+  },
+  {
+    id: 'fullbody-voluptuous-1',
+    type: BodyFeatureType.FULL_BODY,
+    description: 'voluptuous, generous figure',
+    detailedDescription: 'Her body presents generous, voluptuous curves in all the right places, with a fullness that exudes both confidence and sensuality.',
+    forPersonalityType: ['passionate', 'compassionate', 'hopeful'],
+    associatedTraits: ['nurturing', 'sensual', 'confident']
+  },
+  {
+    id: 'fullbody-elegant-1',
+    type: BodyFeatureType.FULL_BODY,
+    description: 'elegant, graceful figure',
+    detailedDescription: 'Her body moves with natural elegance, with proportions that create fluid lines and graceful contours in every position and movement.',
+    forPersonalityType: ['harmonious', 'contemplative', 'compassionate'],
+    associatedTraits: ['graceful', 'poised', 'refined']
+  }
+];
+
+// Movement features
+const movementFeatures: PhysicalFeature[] = [
+  {
+    id: 'movement-fluid-1',
+    type: BodyFeatureType.MOVEMENT,
+    description: 'fluid, graceful movement',
+    detailedDescription: 'She moves with a fluid grace that suggests both physical awareness and natural elegance, each gesture flowing seamlessly into the next.',
+    forPersonalityType: ['harmonious', 'contemplative', 'compassionate'],
+    associatedTraits: ['graceful', 'self-aware', 'poised']
+  },
+  {
+    id: 'movement-confident-1',
+    type: BodyFeatureType.MOVEMENT,
+    description: 'confident, purposeful movement',
+    detailedDescription: 'Her movements carry an unmistakable confidence and purpose, occupying space with assurance and moving directly and intentionally.',
+    forPersonalityType: ['challenging', 'passionate', 'inquisitive'],
+    associatedTraits: ['assertive', 'focused', 'confident']
+  },
+  {
+    id: 'movement-sensual-1',
+    type: BodyFeatureType.MOVEMENT,
+    description: 'sensual, fluid movement',
+    detailedDescription: 'She moves with a natural sensuality that draws attention, her body seeming to flow rather than simply walk, with a rhythm that highlights her curves.',
+    forPersonalityType: ['passionate', 'hopeful', 'harmonious'],
+    associatedTraits: ['self-assured', 'sensual', 'expressive']
+  }
+];
+
+// Posture features
+const postureFeatures: PhysicalFeature[] = [
+  {
+    id: 'posture-confident-1',
+    type: BodyFeatureType.POSTURE,
+    description: 'confident, open posture',
+    detailedDescription: 'Her posture radiates confidence with shoulders back and head held high, taking up space without apology and presenting herself fully to the world.',
+    forPersonalityType: ['challenging', 'passionate', 'hopeful'],
+    associatedTraits: ['confident', 'assertive', 'open']
+  },
+  {
+    id: 'posture-graceful-1',
+    type: BodyFeatureType.POSTURE,
+    description: 'graceful, elegant posture',
+    detailedDescription: 'Her posture has a natural elegance, with a perfect alignment that speaks to both physical awareness and inner calm.',
+    forPersonalityType: ['harmonious', 'contemplative', 'compassionate'],
+    associatedTraits: ['composed', 'dignified', 'mindful']
+  },
+  {
+    id: 'posture-relaxed-1',
+    type: BodyFeatureType.POSTURE,
+    description: 'relaxed, approachable posture',
+    detailedDescription: 'Her posture is naturally relaxed yet attentive, creating an approachable presence that invites conversation and connection.',
+    forPersonalityType: ['compassionate', 'hopeful', 'inquisitive'],
+    associatedTraits: ['approachable', 'attentive', 'genuine']
+  }
+];
+
+// All physical features
+export const allPhysicalFeatures: PhysicalFeature[] = [
+  ...faceFeatures,
+  ...eyesFeatures,
+  ...lipsFeatures,
+  ...hairFeatures,
+  ...chestFeatures,
+  ...waistFeatures,
+  ...hipsFeatures,
+  ...bottomFeatures,
+  ...legsFeatures,
+  ...thighsFeatures,
+  ...fullBodyFeatures,
+  ...movementFeatures,
+  ...postureFeatures
+];
+
+// =====================================================
+// Search and Filtering Functions
+// =====================================================
+
+/**
+ * Get features by type
+ */
+export const getFeaturesByType = (type: BodyFeatureType): PhysicalFeature[] => {
+  return allPhysicalFeatures.filter(feature => feature.type === type);
+};
+
+/**
+ * Get features by personality type
+ */
+export const getFeaturesByPersonalityType = (personalityType: string): PhysicalFeature[] => {
+  return allPhysicalFeatures.filter(feature => 
+    feature.forPersonalityType.includes(personalityType)
+  );
+};
+
+/**
+ * Get features associated with specific character traits
+ */
+export const getFeaturesByAssociatedTrait = (trait: string): PhysicalFeature[] => {
+  return allPhysicalFeatures.filter(feature => 
+    feature.associatedTraits.includes(trait)
+  );
+};
+
+/**
+ * Find the most appropriate feature for a being
+ */
+export const findAppropriateFeature = (
+  being: any,
+  featureType: BodyFeatureType
+): PhysicalFeature | null => {
+  // Get all features of the requested type
+  const featuresOfType = getFeaturesByType(featureType);
+  
+  // Filter by personality type if available
+  const matchingFeatures = featuresOfType.filter(feature => 
+    feature.forPersonalityType.includes(being.personality.primaryTrait) ||
+    feature.forPersonalityType.includes(being.personality.secondaryTrait)
+  );
+  
+  // Return a random matching feature or null if none found
+  return matchingFeatures.length > 0
+    ? matchingFeatures[Math.floor(Math.random() * matchingFeatures.length)]
+    : null;
+};
+
+/**
+ * Generate a comprehensive physical description for a being
+ */
+export const generatePhysicalDescription = (being: any): string => {
+  // Get features for different body parts that match this being's personality
+  const face = findAppropriateFeature(being, BodyFeatureType.FACE);
+  const eyes = findAppropriateFeature(being, BodyFeatureType.EYES);
+  const hair = findAppropriateFeature(being, BodyFeatureType.HAIR);
+  const fullBody = findAppropriateFeature(being, BodyFeatureType.FULL_BODY);
+  const bottom = findAppropriateFeature(being, BodyFeatureType.BOTTOM);
+  const legs = findAppropriateFeature(being, BodyFeatureType.LEGS);
+  const movement = findAppropriateFeature(being, BodyFeatureType.MOVEMENT);
+  
+  // Compose description
+  let description = `${being.personality.name}'s ${being.appearance.form} takes shape with `;
+  
+  if (fullBody) {
+    description += `a ${fullBody.description}. `;
+  }
+  
+  if (face && eyes) {
+    description += `Her face features ${face.description} highlighted by ${eyes.description}. `;
+  }
+  
+  if (hair) {
+    description += `She has ${hair.description} that complements her features beautifully. `;
+  }
+  
+  if (legs && bottom) {
+    description += `Her ${legs.description} lead to a ${bottom.description} that perfectly balances her proportions. `;
+  }
+  
+  if (movement) {
+    description += `She moves with ${movement.description}, embodying her ${being.personality.primaryTrait} nature. `;
+  }
+  
+  description += `Every aspect of her physical form expresses the perfect balance of ${being.personality.primaryTrait} energy and captivating beauty.`;
+  
+  return description;
+};
